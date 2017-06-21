@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <title>FileNet</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style type="text/css">
+    a{
+    	color:white;
+    }
+    </style>
+  </head>
+  <body>
+	 <div class="container">
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<nav class="navbar navbar-default" role="navigation">
+					<div class="navbar-header">
+						 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"> <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button> <a class="navbar-brand" href="index.html">FileNet</a>
+					</div>
+					
+					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+						<ul class="nav navbar-nav">
+							<li class="active">
+								 <a href="file.html">文件管理</a>
+							</li>
+							<li>
+								 <a href="charts.html">数据分析</a>
+							</li>
+							<li>
+								 <a href="system.html">系统管理</a>
+							</li>
+						</ul>
+						<ul class="nav navbar-nav navbar-right">
+							<li>
+								 <a href="#">admin</a>
+							</li>
+						</ul>
+					</div>
+					
+				</nav>
+			</div>
+		</div>
+		<div class="row clearfix">
+			<div class="col-md-12 column">
+				<table class="table"  id="fileTable">
+					<thead>
+						<tr>
+							<th>
+								编号
+							</th>
+							<th>
+								文件名称
+							</th>
+							<th>
+								文件路径
+							</th>
+							<th>
+								操作
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+				<input type = 'hidden'  name="currentCount" id="currentCount"  value="0"/>
+				<input type = 'hidden'  name="totalRow" id="totalRow" />
+				共计 <span id="totalCount">0</span> 条记录
+				<ul class="pagination" style="float:right;">
+				<li>
+					 <a href="#" onclick='goPage(0);'>首页</a>
+				</li>
+				<li>
+					 <a href="#" onclick='goPage(-1);'>上一页</a>
+				</li>
+				<li>
+					 <a href="#" onclick='goPage(1);'>下一页</a>
+				</li>
+			</ul>
+			</div>
+		</div>
+	</div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.js"></script>
+    <script type="text/javascript">
+    	$(function(){
+    		var userno = 'admin';
+    		var currentCount = $('#currentCount').val();
+			$.ajax({
+				   type: "POST",
+				   url: "listFile.action",
+				   data: "userno="+userno+"&currentCount="+currentCount+"&num=0"+"&time="+new Date(),
+				   success: function(data){
+					   var jsonObject = eval('('+data+')');
+					   $('#currentCount').val(jsonObject.currentCount);
+					   $('#totalCount').html(jsonObject.totalRow);
+					   $('#total').html(jsonObject.totalRow);
+					   $('#fileTable tr:not(:first)').empty();
+					   for(var i = 0 ; i < jsonObject.datas.length ; i++){
+						  var fileInfo =  jsonObject.datas[i];
+						  var trHTML = "<tr><td>"+(i+1)+"</td><td>"+fileInfo.name+"</td><td>"+fileInfo.path+"</td><td><button type='button' class='btn btn-default btn-primary'><a href='download.action?filepath="+fileInfo.path+"'>下载</a></button><button type='button' class='btn btn-default btn-danger'>删除</button>"+"</td></tr>"
+						  $("#fileTable").append(trHTML);//在table最后面添加一行
+					   }
+				   },
+					error: function(data){
+						alert(data);
+					}
+			}); 
+    	})
+    	function goPage(num){
+    		var userno = 'admin';
+    		var currentCount = $('#currentCount').val();
+			$.ajax({
+				   type: "POST",
+				   url: "listFile.action",
+				   data: "userno="+userno+"&currentCount="+currentCount+"&num="+num+"&time="+new Date(),
+				   success: function(data){
+					   var jsonObject = eval('('+data+')');
+					   $('#currentCount').val(jsonObject.currentCount);
+					   $('#totalCount').html(jsonObject.totalRow);
+					   $('#total').html(jsonObject.totalRow);
+					   $('#fileTable tr:not(:first)').empty();
+					   for(var i = 0 ; i < jsonObject.datas.length ; i++){
+							  var fileInfo =  jsonObject.datas[i];
+							  var trHTML = "<tr><td>"+(i+1)+"</td><td>"+fileInfo.name+"</td><td>"+fileInfo.path+"</td><td><button type='button' class='btn btn-default btn-primary'><a href='download.action?filepath="+fileInfo.path+"'>下载</a></button><button type='button' class='btn btn-default btn-danger'>删除</button>"+"</td></tr>"
+							  $("#fileTable").append(trHTML);//在table最后面添加一行
+						   }
+				   },
+					error: function(data){
+						alert(data);
+					}
+			}); 
+    	}
+    	function goPrePage(){
+    		
+    	}
+    	function goNextPage(){
+    		
+    	}
+    </script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+  </body>
+</html>
